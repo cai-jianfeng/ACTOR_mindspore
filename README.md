@@ -1,4 +1,4 @@
-# ACTOR
+# ACTOR code reproduce using mindspore
 
 Official mindspore implementation of the paper [**"Action-Conditioned 3D Human Motion Synthesis
 with Transformer VAE"**](https://arxiv.org/abs/2104.05670), [ICCV 2021](http://iccv2021.thecvf.com/home).
