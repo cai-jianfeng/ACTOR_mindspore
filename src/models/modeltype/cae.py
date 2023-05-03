@@ -81,10 +81,11 @@ class CAE(nn.Cell):
     def lengths_to_mask(lengths):
         max_len = max(lengths)
         if isinstance(max_len, ms.Tensor):
-            max_len = max_len.item()
-        index = ops.arange(max_len).expand(len(lengths), max_len)
+            max_len = max_len.numpy().item()
+        index = ops.arange(max_len).astype(ms.int32).expand(ms.Tensor((len(lengths), max_len), dtype=ms.int32))  # shape = (nspa * nats, max_len)
+        # print(index.shape)
         mask = index < lengths.unsqueeze(1)
-        return mask
+        return mask  # shape = (nspa * nats, max_len)
 
     def generate_one(self, cls, duration, fact=1, xyz=False):
         y = ms.Tensor([cls], ms.int32)[None]
@@ -109,28 +110,29 @@ class CAE(nn.Cell):
             nspa = 1
         nats = len(classes)
 
-        y = classes.repeat(nspa)  # (view(nspa, nats))
+        y = classes.repeat(nspa)  # (view(nspa, nats)) -> shape = (nspa * nats, )
 
-        if len(durations.shape) == 1:
-            lengths = durations.repeat(nspa)
+        if len(durations.shape) == 1:  # 进入
+            lengths = durations.repeat(nspa)  # shape = (nspa * nats, )
         else:
             lengths = durations.reshape(y.shape)
 
-        mask = self.lengths_to_mask(lengths)
+        mask = self.lengths_to_mask(lengths)  # shape = (nspa * nats, max_len)
 
-        if noise_same_action == "random":
-            if noise_diff_action == "random":
-                z = ops.standard_normal(nspa * nats, self.latent_dim)
+        if noise_same_action == "random":  # 进入
+            if noise_diff_action == "random":  # 进入
+                z = ops.standard_normal((nspa * nats, self.latent_dim))  # shape = (nspa * nats, 256)
             elif noise_diff_action == "same":
-                z_same_action = ops.standard_normal(nspa, self.latent_dim)
+                z_same_action = ops.standard_normal((nspa, self.latent_dim))
                 z = z_same_action.repeat_interleave(nats, axis=0)
             else:
                 raise NotImplementedError("Noise diff action must be random or same.")
         elif noise_same_action == "interpolate":
             if noise_diff_action == "random":
-                z_diff_action = ops.standard_normal(nats, self.latent_dim)
+                z_diff_action = ops.standard_normal((nats, self.latent_dim))
             elif noise_diff_action == "same":
-                z_diff_action = ops.standard_normal(1, self.latent_dim).repeat(nats, 1)
+                z_diff_action = ops.standard_normal((1, self.latent_dim))
+                z_diff_action = ops.tile(z_diff_action, (nats, 1))
             else:
                 raise NotImplementedError("Noise diff action must be random or same.")
             start = ms.Tensor(-1, ms.int32)
@@ -148,15 +150,14 @@ class CAE(nn.Cell):
             z = z_diff_action.repeat((nspa, 1))
         else:
             raise NotImplementedError("Noise same action must be random, same or interpolate.")
-
+        # z.shape = (nspa * nats, 256); y.shape = (nspa * nats, );
+        # mask.shape = (nspa * nats, max_len); lengths.shape = (nspa * nats, )
         batch = {"z": fact * z, "y": y, "mask": mask, "lengths": lengths}
-        batch = self.decoder(batch)
-
-        if self.outputxyz:
-            batch["output_xyz"] = self.rot2xyz(batch["output"], batch["mask"])
+        batch = self.decoder(batch)  # z.shape = (1, nspa * nats, 256); output.shape = (nspa * nats, 25, 6, max_len)
+        if self.outputxyz:  # 进入
+            batch["output_xyz"] = self.rot2xyz(batch["output"], batch["mask"])  # shape = [batch size, ?, 3, max_len]
         elif self.pose_rep == "xyz":
             batch["output_xyz"] = batch["output"]
-
         return batch
 
     def return_latent(self, batch, seed=None):

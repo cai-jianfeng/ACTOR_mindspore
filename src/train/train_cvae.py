@@ -30,7 +30,7 @@ def do_epochs(model, datasets, parameters, optimizer):
     train_iterator = train_iterator.batch(batch_size=parameters["batch_size"], num_parallel_workers=8)
     # train_iterator = DataLoader(dataset, batch_size=parameters["batch_size"],
     #                             shuffle=True, num_workers=8, collate_fn=collate)
-    print('dataset construct success')
+    print(f'dataset construct success, the total data is {len(train_iterator)}')
     logpath = os.path.join(parameters["folder"], "training.log")
     with open(logpath, "w") as logfile:
         for epoch in range(1, parameters["num_epochs"] + 1):
@@ -40,13 +40,13 @@ def do_epochs(model, datasets, parameters, optimizer):
             #     dict_loss[key] /= len(train_iterator)
             #     writer.add_scalar(f"Loss/{key}", dict_loss[key], epoch)
 
-            epochlog = f"Epoch {epoch}, train batch losses: {dict_loss}, train_epoch_loss: {epoch_dict_loss}"
+            epochlog = f"Epoch {epoch}, train final batch losses: {dict_loss}, train_epoch_loss: {epoch_dict_loss}"
             print(epochlog)
             print(epochlog, file=logfile)
 
             if ((epoch % parameters["snapshot"]) == 0) or (epoch == parameters["num_epochs"]):
                 checkpoint_path = os.path.join(parameters["folder"],
-                                               'checkpoint_{:04d}.pth.tar'.format(epoch))
+                                               'checkpoint_{:04d}.ckpt'.format(epoch))
                 print('Saving checkpoint {}'.format(checkpoint_path))
                 ms.save_checkpoint(model, checkpoint_path)
 

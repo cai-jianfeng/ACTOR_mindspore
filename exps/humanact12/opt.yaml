@@ -1,6 +1,6 @@
 activation: gelu
 archiname: transformer
-batch_size: 1
+batch_size: 20
 dataset: humanact12
 debug: false
 expname: exps
@@ -28,7 +28,7 @@ max_len: -1
 min_len: -1
 modelname: cvae_transformer_rc_rcxyz_kl
 modeltype: cvae
-num_epochs: 5
+num_epochs: 1
 num_frames: 60
 num_layers: 8
 num_seq_max: -1

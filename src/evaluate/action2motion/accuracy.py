@@ -6,17 +6,23 @@
 @Author: caijianfeng
 """
 import mindspore as ms
+import mindspore.ops as ops
+import torch
 
 
 def calculate_accuracy(model, motion_loader, num_labels, classifier, device):
-    confusion = ms.ops.zeros(num_labels, num_labels, dtype=ms.int64)
+    confusion = torch.zeros(num_labels, num_labels, dtype=torch.long)
     with torch.no_grad():
-    # TODO: mindspore 中如何显式不计算梯度
+        # TODO: mindspore 中如何显式不计算梯度 -> 解决
         for batch in motion_loader:
-            batch_prob = classifier(batch["output_xyz"], lengths=batch["lengths"])
+            output_xyz = torch.from_numpy(batch["output_xyz"].numpy())
+            lengths = torch.from_numpy(batch["lengths"].numpy())
+            batch_prob = classifier(output_xyz, lengths=lengths)
             batch_pred = batch_prob.max(dim=1).indices
-            for label, pred in zip(batch["y"], batch_pred):
+            y = torch.from_numpy(batch["y"].numpy())
+            for label, pred in zip(y, batch_pred):
                 confusion[label][pred] += 1
-
-    accuracy = ms.Tensor.trace(confusion)/ms.ops.reduce_sum(confusion)
-    return accuracy.item(), confusion
+    confusion = ms.Tensor.from_numpy(confusion.numpy())
+    # print(confusion)
+    accuracy = ms.Tensor.trace(confusion).float() / ops.reduce_sum(confusion).float()
+    return accuracy.numpy().item(), confusion

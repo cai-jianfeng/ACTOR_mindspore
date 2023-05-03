@@ -6,11 +6,13 @@
 @Author: caijianfeng
 """
 import mindspore as ms
+import mindspore.ops as ops
 import numpy as np
 
 
 # from action2motion
 def calculate_diversity_multimodality(activations, labels, num_labels):
+    # print(type(activations), ';', activations.shape)
     diversity_times = 200
     multimodality_times = 20
     labels = labels.long()
@@ -18,12 +20,12 @@ def calculate_diversity_multimodality(activations, labels, num_labels):
 
     diversity = 0
 
-    first_indices = np.random.randint(0, num_motions, diversity_times)
-    second_indices = np.random.randint(0, num_motions, diversity_times)
+    first_indices = ms.Tensor.from_numpy(np.random.randint(0, num_motions, diversity_times))
+    second_indices = ms.Tensor.from_numpy(np.random.randint(0, num_motions, diversity_times))
     for first_idx, second_idx in zip(first_indices, second_indices):
-        # TODO: 验证 torch.dist 是否等于 ms.ops.cdist
-        diversity += ms.ops.cdist(activations[first_idx, :],
-                                  activations[second_idx, :])
+        # TODO: 验证 torch.dist 是否等于 ms.ops.dist -> 解决
+        diversity += ops.dist(activations[first_idx, :],
+                              activations[second_idx, :])
     diversity /= diversity_times
 
     multimodality = 0
@@ -45,9 +47,9 @@ def calculate_diversity_multimodality(activations, labels, num_labels):
 
         first_activation = activations[first_idx, :]
         second_activation = activations[second_idx, :]
-        multimodality += ms.ops.cdist(first_activation,
-                                      second_activation)
+        multimodality += ops.dist(first_activation,
+                                  second_activation)
 
     multimodality /= (multimodality_times * num_labels)
 
-    return diversity.item(), multimodality.item()
+    return diversity.numpy().item(), multimodality.numpy().item()

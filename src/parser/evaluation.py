@@ -14,7 +14,7 @@ def parser():
     parser.add_argument("--num_seq_max", default=3000, type=int, help="number of sequences maximum to load or -1")
 
     # cuda options
-    add_cuda_options(parser)
+    # add_cuda_options(parser)
     
     opt = parser.parse_args()
     newparameters = {key: val for key, val in vars(opt).items() if val is not None}
@@ -22,7 +22,7 @@ def parser():
     folder, checkpoint = os.path.split(newparameters["checkpointname"])
     parameters = load_args(os.path.join(folder, "opt.yaml"))
     parameters.update(newparameters)
-    adding_cuda(parameters)
+    # adding_cuda(parameters)
 
     epoch = int(checkpoint.split("_")[1].split('.')[0])
     return parameters, folder, checkpoint, epoch, opt.niter

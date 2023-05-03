@@ -3,6 +3,7 @@ import yaml
 
 def format_metrics(metrics, formatter="{:.6}"):
     newmetrics = {}
+    # print(metrics)
     for key, val in metrics.items():
         newmetrics[key] = formatter.format(val)
     return newmetrics

@@ -201,7 +201,6 @@ class Decoder_TRANSFORMER(nn.Cell):
 
     def construct(self, batch):
         z, y, mask, lengths = batch["z"], batch["y"], batch["mask"], batch["lengths"]
-
         latent_dim = z.shape[1]  # 256
         bs, nframes = mask.shape  # batch size, 60
         njoints, nfeats = self.njoints, self.nfeats  # 25, 6
@@ -213,7 +212,7 @@ class Decoder_TRANSFORMER(nn.Cell):
             z = ops.concat((z, yoh), axis=1)
             z = self.ztimelinear(z)
             z = z[None]  # sequence of size 1
-        else:
+        else:  # 进入
             # only for ablation / not used in the final model
             if self.ablation == "concat_bias":  # 不会进入
                 # sequence of size 2
