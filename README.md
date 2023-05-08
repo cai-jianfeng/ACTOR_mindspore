@@ -1,9 +1,9 @@
 # ACTOR
 
-Official Pytorch implementation of the paper [**"Action-Conditioned 3D Human Motion Synthesis
+Official mindspore implementation of the paper [**"Action-Conditioned 3D Human Motion Synthesis
 with Transformer VAE"**](https://arxiv.org/abs/2104.05670), [ICCV 2021](http://iccv2021.thecvf.com/home).
 
-Please visit our [**webpage**](https://imagine.enpc.fr/~petrovim/actor/) for more details.
+Please visit the authors [**webpage**](https://imagine.enpc.fr/~petrovim/actor/) for more details.
 
 ![teaser_light](visuals/bigteaser_white.png#gh-light-mode-only)![teaser_dark](visuals/bigteaser_white_neg.png#gh-dark-mode-only)
 
