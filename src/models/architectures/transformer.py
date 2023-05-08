@@ -31,7 +31,7 @@ class PositionalEncoding(nn.Cell):
 
     def construct(self, x):
         # not used in the final model
-        # x.shape = [62, batch size, 256]; self.pe[:x.shape[0], :].shape = [2, 1, 256]
+        # x.shape = [62, batch size, 256]; self.pe[:x.shape[0], :].shape = [62, 1, 256]
         x = x + self.pe[:x.shape[0], :]
         return self.dropout(x)  # [62, batch size, 256]
 
@@ -132,7 +132,7 @@ class Encoder_TRANSFORMER(nn.Cell):
             xseq = ops.concat((self.muQuery[y][None], self.sigmaQuery[y][None], x), axis=0)  # shape = [62, batch size, 256]
 
             # add positional encoding
-            xseq = self.sequence_pos_encoder(xseq)  # [2, batch size, 256]
+            xseq = self.sequence_pos_encoder(xseq)  # [62, batch size, 256]
 
             # create a bigger mask, to allow attend to mu and sigma
             muandsigmaMask = ops.ones((bs, 2), ms.bool_)  # [batch size, 2]
@@ -220,8 +220,8 @@ class Decoder_TRANSFORMER(nn.Cell):
                 z = ops.stack((z, self.actionBiases[y]), axis=0)
             else:  # 进入
                 # shift the latent noise vector to be the action noise
-                z = z + self.actionBiases[y]  # shape = [20, 256]
-                z = z[None]  # sequence of size 1 -> shape = [1, 20, 256]
+                z = z + self.actionBiases[y]  # shape = [bs, 256]
+                z = z[None]  # sequence of size 1 -> shape = [1, bs, 256]
 
         timequeries = ops.zeros((nframes, bs, latent_dim), ms.float32)  # shape = (60, batch size, 256)
 

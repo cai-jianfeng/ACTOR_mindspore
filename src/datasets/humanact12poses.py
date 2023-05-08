@@ -11,7 +11,7 @@ class HumanAct12Poses(Dataset):
         self.datapath = datapath
 
         super().__init__(**kargs)
-
+        # pickle: 对 python 对象进行序列化
         pkldatafilepath = os.path.join(datapath, "humanact12poses.pkl")
         data = pkl.load(open(pkldatafilepath, "rb"))
 

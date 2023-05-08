@@ -19,14 +19,15 @@ def lengths_to_mask(lengths):
 def collate_tensors(batch):
     dims = batch[0].dim()
     max_size = [max([b.shape[i] for b in batch]) for i in range(dims)]
-    size = (len(batch),) + tuple(max_size)
+    size = (len(batch),) + tuple(max_size)  # (20, 60, 25, 6)
     # canvas = batch[0].new_zeros(size=size)
     canvas = ops.zeros(size, batch[0].dtype)
     for i, b in enumerate(batch):
-        sub_tensor = canvas[i]
+        sub_tensor = canvas[i]  # (60, 25, 6)
         for d in range(dims):
             sub_tensor = sub_tensor.narrow(d, 0, b.shape[d])
-        sub_tensor.add(b)
+        canvas[i] = sub_tensor.add(b)
+    # print(canvas)
     return canvas
 
 
@@ -41,9 +42,11 @@ def collate(batch):
     databatchTensor = collate_tensors(databatch)
     # labelbatchTensor = ms.Tensor(labelbatch, dtype=ms.int64)
     labelbatchTensor = labelbatch
-    lenbatchTensor = ms.Tensor(lenbatch, dtype=ms.int64)
-
+    # print(labelbatchTensor)
+    lenbatchTensor = ms.Tensor(lenbatch, dtype=ms.int32)
+    # print(lenbatchTensor)
     maskbatchTensor = lengths_to_mask(lenbatchTensor)
+    # print(maskbatchTensor)
     batch = {"x": databatchTensor, "y": labelbatchTensor,
              "mask": maskbatchTensor, "lengths": lenbatchTensor}
     return batch

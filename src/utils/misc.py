@@ -24,7 +24,7 @@ def to_ms(ndarray):
     if type(ndarray).__module__ == 'numpy':
         return ms.Tensor.from_numpy(ndarray).astype(ms.float32)
     elif not is_tensor(ndarray):
-        raise ValueError("Cannot convert {} to torch tensor".format(
+        raise ValueError("Cannot convert {} to mindspore tensor".format(
             type(ndarray)))
     return ndarray
 

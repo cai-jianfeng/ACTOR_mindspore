@@ -1,15 +1,15 @@
-# ACTOR code reproduce using mindspore
+# ACTOR
 
-Official mindspore implementation of the paper [**"Action-Conditioned 3D Human Motion Synthesis
+Official Pytorch implementation of the paper [**"Action-Conditioned 3D Human Motion Synthesis
 with Transformer VAE"**](https://arxiv.org/abs/2104.05670), [ICCV 2021](http://iccv2021.thecvf.com/home).
 
-Please visit the authors of [**webpage**](https://imagine.enpc.fr/~petrovim/actor/) for more details.
+Please visit our [**webpage**](https://imagine.enpc.fr/~petrovim/actor/) for more details.
 
 ![teaser_light](visuals/bigteaser_white.png#gh-light-mode-only)![teaser_dark](visuals/bigteaser_white_neg.png#gh-dark-mode-only)
 
 
 #### Bibtex
-If you find this code useful in your research, please cite the original paper references:
+If you find this code useful in your research, please cite:
 
 ```
 @INPROCEEDINGS{petrovich21actor,
@@ -131,7 +131,7 @@ Each line corresponds to an action.
 The first column on the right represents a movement of the dataset, and the second column represents the reconstruction of the movement (via encoding/decoding). All other columns on the left are generations with random noise.
 
 ##### Example
-![ntugrid.gif](./visuals/ntugrid.gif#gh-light-mode-only)![ntugrid.gif](visuals/ntugrid_neg.gif#gh-dark-mode-only)
+![ntugrid.gif](visuals/ntugrid.gif#gh-light-mode-only)![ntugrid.gif](visuals/ntugrid_neg.gif#gh-dark-mode-only)
 
 
 ### Generating and rendering SMPL meshes

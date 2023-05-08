@@ -15,7 +15,7 @@ from .get_model import JOINTSTYPES
 
 class Rotation2xyz:
     def __init__(self, device=None):
-        self.device = device
+        self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
         self.smpl_model = SMPL().eval()
 
     def __call__(self, x, mask, pose_rep, translation, glob,
@@ -42,7 +42,7 @@ class Rotation2xyz:
             raise NotImplementedError("This jointstype is not implemented.")
 
         if translation:  # 进入
-            x_translations = x[:, -1, :3]  # -1 表示该维度舍弃  shape = (x.shape[0], 3, x.shape[3]) = [batch size, 3, 60]
+            x_translations = x[:, -1, :3]  # -1 表示该维度舍弃(取该维度的最后一个)  shape = (x.shape[0], 3, x.shape[3]) = [batch size, 3, 60]
             x_rotations = x[:, :-1]  # shape = (x.shape[0], x.shape[1]-1, x.shape[2], x.shape[3]) = [batch size, 24, 6, 60]
         else:
             x_rotations = x

@@ -13,16 +13,19 @@ import mindspore.ops as ops
 import mindspore.nn as nn
 
 def compute_rc_loss(model, batch):
+    # batch['x'].shape = [batch size, 25, 6, 60];
+    # batch["output"] = [batch size, 25, 6, 60];
+    # batch["mask"] = [batch size, 60]
     x = batch["x"]
     output = batch["output"]
     mask = batch["mask"]
 
-    gtmasked = x.permute(0, 3, 1, 2)[mask]
+    gtmasked = x.permute(0, 3, 1, 2)[mask]  # [batch size, 60, 25, 6]
     # x = x.permute(0, 3, 1, 2).numpy()
     # mask = mask.numpy()
     # gtmasked = ms.Tensor.from_numpy(x[mask]).astype(ms.float32)
 
-    outmasked = output.permute(0, 3, 1, 2)[mask]
+    outmasked = output.permute(0, 3, 1, 2)[mask]  # [batch size, 60, 25, 6]
     # output = output.permute(0, 3, 1, 2).numpy()
     # outmasked = ms.Tensor.from_numpy(output[mask]).astype(ms.float32)
 
@@ -31,16 +34,18 @@ def compute_rc_loss(model, batch):
 
 
 def compute_rcxyz_loss(model, batch):
+    # batch["x_xyz"] = [batch size, 6890, 3, 60];
+    # batch["output_xyz"] = [batch size, 6890, 3, 60]
     x = batch["x_xyz"]
     output = batch["output_xyz"]
     mask = batch["mask"]
 
-    gtmasked = x.permute(0, 3, 1, 2)[mask]
+    gtmasked = x.permute(0, 3, 1, 2)[mask]  # [batch size, 60, 6890, 3]
     # x = x.permute(0, 3, 1, 2).numpy()
     # mask = mask.numpy()
     # gtmasked = ms.Tensor.from_numpy(x[mask]).astype(ms.float32)
 
-    outmasked = output.permute(0, 3, 1, 2)[mask]
+    outmasked = output.permute(0, 3, 1, 2)[mask]  # [batch size, 60, 6890, 3]
     # output = output.permute(0, 3, 1, 2).numpy()
     # outmasked = ms.Tensor.from_numpy(output[mask]).astype(ms.float32)
 
@@ -92,7 +97,7 @@ def compute_velxyz_loss(model, batch):
 
 
 def compute_hp_loss(model, batch):
-    # TODO: 实现 torch.random.seed 的对应的 mindspore
+    # TODO: 实现 torch.random.seed 的对应的 mindspore -> 解决
     loss = hessian_penalty(model.return_latent, batch, seed=ms.get_seed())
     return loss
 

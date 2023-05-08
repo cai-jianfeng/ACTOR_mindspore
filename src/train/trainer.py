@@ -46,14 +46,15 @@ def train_or_test(model, optimizer, iterator, mode="train"):
         return mixed_loss, losses
 
     # has_aux=True 表示只有 forward_fn 的第一个输出贡献梯度
-    grad_fn = ms.value_and_grad(forward_fn, None, optimizer.parameters, has_aux=False)
+    grad_fn = ms.value_and_grad(forward_fn, None, optimizer.parameters, has_aux=True)
 
     # with grad_env():
-    iterator = tqdm(enumerate(iterator))
-    for i, batch in iterator:
+    # iterator = tqdm(enumerate(iterator), desc="")
+    for i, (inp, target) in tqdm(enumerate(iterator.create_tuple_iterator()), desc=f"Compute batch: "):
         # batch['x'].shape = [batch size, 25, 6, 60]; batch['y'].shape = [batch size, ];
         # batch['mask'].shape = [batch size, 60]; batch['lengths'].shape = [batch size, ]
         # inp, target = batch
+        batch = (inp, target)
         # batch = [ms.Tensor.from_numpy(inp), ms.Tensor.from_numpy(target)]
         # Put everything in device
         batch = collate(batch)
@@ -61,7 +62,7 @@ def train_or_test(model, optimizer, iterator, mode="train"):
         #         'y': tensor(int),
         #         'mask: tensor(bool),
         #         'lengths': tensor(int)}
-        batch = {key: val for key, val in batch.items()}
+        # batch = {key: val for key, val in batch.items()}
 
         # if mode == "train":
         #     # update the optimizer
@@ -96,9 +97,10 @@ def train_or_test(model, optimizer, iterator, mode="train"):
             epoch_dict_loss[key] += losses[key]
 
         if mode == "train":
-            mixed_loss = ops.depend(mixed_loss, optimizer(grads))
+            # mixed_loss = ops.depend(mixed_loss, optimizer(grads))
+            optimizer(grads)
             
-            iterator.desc = f"Computing batch: {i}; Loss: {mixed_loss}, train losses: {dict_loss}"
+            # iterator.desc = f"Computing batch: {i}; Loss: {mixed_loss}, train losses: {dict_loss}"
 
     return dict_loss, epoch_dict_loss
 

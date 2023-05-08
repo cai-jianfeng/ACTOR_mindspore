@@ -36,6 +36,7 @@ def parser():
     opt = parser.parse_args()
     
     # remove None params, and create a dictionnary
+    # vars() 函数返回对象object的属性和属性值的字典对象
     parameters = {key: val for key, val in vars(opt).items() if val is not None}
 
     # parse modelname
